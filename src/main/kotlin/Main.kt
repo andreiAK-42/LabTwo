@@ -20,11 +20,13 @@ fun main(args: Array<String>) {
 
     if (getUser.password != hashPassword(arguments.password)) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.INCORRECT_PASSWORD.value)
+        return
     }
 
     val findResource: Resource? = findResource(arguments.resource)
     if  (findResource == null) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_RESOURCE.value)
+        return
     }
 
     if (arguments.volume > 0) {
@@ -39,26 +41,27 @@ fun main(args: Array<String>) {
         Action.valueOf(arguments.action.uppercase())
     } catch (e: Exception) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_ACTION.value)
+        return
     }
 
-    val userAccesValue = findResource!!.accessList.find { it.userLogin == arguments.login }
+    val userAccessValue = findResource!!.accessList.find { it.userLogin == arguments.login }
 
-    var accesAllowed = false
-    if (userAccesValue != null) {
+    var accessAllowed = false
+    if (userAccessValue != null) {
         when (arguments.action) {
             Action.READ.value -> {
-                accesAllowed = checkAcces(userAccesValue.access, 0)
+                accessAllowed = checkAcces(userAccessValue.access, 0)
             }
             Action.WRITE.value -> {
-                accesAllowed = checkAcces(userAccesValue.access, 1)
+                accessAllowed = checkAcces(userAccessValue.access, 1)
             }
             Action.RUN.value -> {
-                accesAllowed = checkAcces(userAccesValue.access, 2)
+                accessAllowed = checkAcces(userAccessValue.access, 2)
             }
         }
 
-        if (!accesAllowed) {
-            println("Программа завершила свою работу с кодом: " + ResponseCode.NOT_ACCES.value)
+        if (!accessAllowed) {
+            println("Программа завершила свою работу с кодом: " + ResponseCode.NOT_ACCESS.value)
             return
         }
     }

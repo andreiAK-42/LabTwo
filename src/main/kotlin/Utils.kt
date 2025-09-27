@@ -21,7 +21,7 @@ fun processResource(resourcePath: String, requestedVolume: Int): Boolean {
     }
 
     if (requestedVolume > resource.value) {
-        println("Ошибка: запрошенный объем ($requestedVolume) превышает доступный ($resource.value)")
+        println("Ошибка: запрошенный объем ($requestedVolume) превышает доступный (${resource.value})")
         return false
     }
 
@@ -61,7 +61,7 @@ enum class ResponseCode(val value: Int) {
     INCORRECT_PASSWORD(2),
     INCORRECT_LOGIN(3),
     BAD_ACTION(4),
-    NOT_ACCES(5),
+    NOT_ACCESS(5),
     BAD_RESOURCE(6),
     BAD_RESOURCE_OR_VALUE(7),
     BIG_VALUE(8);
