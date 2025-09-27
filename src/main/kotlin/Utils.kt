@@ -45,6 +45,10 @@ fun findResource(userResourcePath: String): Resource? {
     return currentResource
 }
 
+fun checkAcces(userAcces: String, needAcces: Int): Boolean {
+   return userAcces[needAcces] == '7'
+}
+
 enum class Action(val value: String) {
     READ("read"),
     WRITE("write"),

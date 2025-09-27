@@ -22,7 +22,8 @@ fun main(args: Array<String>) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.INCORRECT_PASSWORD.value)
     }
 
-    if(findResource(arguments.resource) == null) {
+    val findResource: Resource? = findResource(arguments.resource)
+    if  (findResource == null) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_RESOURCE.value)
     }
 
@@ -40,9 +41,30 @@ fun main(args: Array<String>) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_ACTION.value)
     }
 
+    val userAccesValue = findResource!!.accessList.find { it.userLogin == arguments.login }
+
+    var accesAllowed = false
+    if (userAccesValue != null) {
+        when (arguments.action) {
+            Action.READ.value -> {
+                accesAllowed = checkAcces(userAccesValue.access, 0)
+            }
+            Action.WRITE.value -> {
+                accesAllowed = checkAcces(userAccesValue.access, 1)
+            }
+            Action.RUN.value -> {
+                accesAllowed = checkAcces(userAccesValue.access, 2)
+            }
+        }
+
+        if (!accesAllowed) {
+            println("Программа завершила свою работу с кодом: " + ResponseCode.NOT_ACCES.value)
+            return
+        }
+    }
+
     println("Программа завершила свою работу с кодом: " + ResponseCode.SUCCES.value)
 }
-
 
 fun parseArguments(args: Array<String>): Arguments {
     val parser = ArgParser("LabTwo")
