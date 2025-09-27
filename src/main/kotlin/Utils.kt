@@ -11,6 +11,18 @@ fun getUserHashPassword(login: String): User? {
     return UserBase.find { user -> user.login == login }
 }
 
+fun findResource(userResourcePath: String): Boolean {
+    val pathParts = userResourcePath.split(".")
+    var currentResource: Resource? = MainResource
+
+    for (part in pathParts) {
+        currentResource = currentResource?.resources?.find { it.name == part }
+        if (currentResource == null) return false
+    }
+
+    return true
+}
+
 enum class Action(val value: String) {
     Read("Read"),
     Write("Write"),

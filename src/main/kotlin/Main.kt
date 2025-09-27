@@ -7,7 +7,6 @@ fun main(args: Array<String>) {
 
     println("Программа продолжает работу с кодом: " + ResponseCode.GET_REPORT.value)
 
-
     val getUser: User? = getUserHashPassword(arguments.login)
 
     if (getUser == null) {
@@ -18,6 +17,10 @@ fun main(args: Array<String>) {
     if (getUser.password != hashPassword(arguments.password)) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.INCORRECT_PASSWORD.value)
         return
+    }
+
+    if(!findResource(arguments.resource)) {
+        println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_RESOURCE.value)
     }
 
     try {
@@ -35,6 +38,7 @@ fun parseArguments(args: Array<String>): Arguments {
 
     val login by parser.option(
         ArgType.String,
+        description = "яйца яйца яйца",
         fullName = "login"
     ).required()
 
@@ -63,4 +67,6 @@ fun parseArguments(args: Array<String>): Arguments {
     return Arguments(login, password, action, resource, volume)
 }
 
-data class Arguments(val login: String, val password: String, val action: String, val resource: String, val volume: String)
+data class Arguments(val login: String, val password: String,
+                     val action: String, val resource: String,
+                     val volume: String)
