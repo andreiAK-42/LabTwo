@@ -38,7 +38,6 @@ fun parseArguments(args: Array<String>): Arguments {
 
     val login by parser.option(
         ArgType.String,
-        description = "яйца яйца яйца",
         fullName = "login"
     ).required()
 
