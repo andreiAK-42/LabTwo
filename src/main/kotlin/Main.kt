@@ -16,7 +16,6 @@ fun main(args: Array<String>) {
 
     if (getUser.password != hashPassword(arguments.password)) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.INCORRECT_PASSWORD.value)
-        return
     }
 
     if(findResource(arguments.resource) == null) {
@@ -32,7 +31,7 @@ fun main(args: Array<String>) {
     }
 
     try {
-        Action.valueOf(arguments.action)
+        Action.valueOf(arguments.action.uppercase())
     } catch (e: Exception) {
         println("Программа завершила свою работу с кодом: " + ResponseCode.BAD_ACTION.value)
     }

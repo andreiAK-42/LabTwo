@@ -1,3 +1,4 @@
+import com.sun.tools.javac.Main
 import java.security.MessageDigest
 
 fun hashPassword(password: String): String {
@@ -24,25 +25,30 @@ fun processResource(resourcePath: String, requestedVolume: Int): Boolean {
         return false
     }
 
+    resource.value -= requestedVolume;
     return true
 }
 
 fun findResource(userResourcePath: String): Resource? {
     val pathParts = userResourcePath.split(".")
-    var currentResource: Resource? = MainResource
+    if (pathParts.isEmpty()) return null
 
-    for (part in pathParts) {
-        currentResource = currentResource?.resources?.find { it.name == part }
-        if (currentResource == null) return null
+    if (pathParts[0] != MainResource.name) return null
+
+    var currentResource: Resource = MainResource
+
+    for (i in 1 until pathParts.size) {
+        val part = pathParts[i]
+        currentResource = currentResource.resources?.find { it.name == part } ?: return null
     }
 
     return currentResource
 }
 
 enum class Action(val value: String) {
-    Read("Read"),
-    Write("Write"),
-    Run("Run")
+    READ("read"),
+    WRITE("write"),
+    RUN("run")
 }
 
 enum class ResponseCode(val value: Int) {
