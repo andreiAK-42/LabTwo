@@ -11,16 +11,32 @@ fun getUserHashPassword(login: String): User? {
     return UserBase.find { user -> user.login == login }
 }
 
-fun findResource(userResourcePath: String): Boolean {
+fun processResource(resourcePath: String, requestedVolume: Int): Boolean {
+    val resource = findResource(resourcePath)
+
+    if (resource == null) {
+        println("Ресурс не найден")
+        return false
+    }
+
+    if (requestedVolume > resource.value) {
+        println("Ошибка: запрошенный объем ($requestedVolume) превышает доступный ($resource.value)")
+        return false
+    }
+
+    return true
+}
+
+fun findResource(userResourcePath: String): Resource? {
     val pathParts = userResourcePath.split(".")
     var currentResource: Resource? = MainResource
 
     for (part in pathParts) {
         currentResource = currentResource?.resources?.find { it.name == part }
-        if (currentResource == null) return false
+        if (currentResource == null) return null
     }
 
-    return true
+    return currentResource
 }
 
 enum class Action(val value: String) {
