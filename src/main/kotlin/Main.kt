@@ -1,8 +1,12 @@
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
+import java.io.PrintStream
+import java.nio.charset.StandardCharsets
 
 fun main(args: Array<String>) {
+    System.setOut(PrintStream(System.out, true, StandardCharsets.UTF_8))
+
     val arguments = parseArguments(args)
 
     println("Программа продолжает работу с кодом: " + ResponseCode.GET_REPORT.value)
