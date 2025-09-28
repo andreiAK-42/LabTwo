@@ -1,4 +1,3 @@
-import com.sun.tools.javac.Main
 import java.security.MessageDigest
 
 fun hashPassword(password: String): String {
