@@ -1,4 +1,5 @@
 import java.security.MessageDigest
+import kotlin.system.exitProcess
 
 fun hashPassword(password: String): String {
     val digest = MessageDigest.getInstance("SHA-256")
@@ -7,45 +8,60 @@ fun hashPassword(password: String): String {
     return encodedHash.fold("") { str, byte -> str + "%02x".format(byte) }
 }
 
-fun getUserHashPassword(login: String): User? {
-    return UserBase.find { user -> user.login == login }
+fun tryGetUser(login: String, password: String): User {
+    val findUser: User? = UserStorage.find { user -> user.login == login }
+
+    if (findUser == null) { exitProcess(ResponseCode.INCORRECT_LOGIN.value) }
+
+    if (findUser.password != hashPassword(password)) { exitProcess(ResponseCode.INCORRECT_PASSWORD.value) }
+
+    return findUser
 }
 
-fun processResource(resourcePath: String, requestedVolume: Int): Boolean {
-    val resource = findResource(resourcePath)
+fun tryGetResource(resourcePath: String, requestedVolume: Int): Resource {
+    val resource = getResource(resourcePath)
 
-    if (resource == null) {
-        println("Ресурс не найден")
-        return false
-    }
+    if (requestedVolume > resource.value) { exitProcess(ResponseCode.BIG_VALUE.value) }
+    if (requestedVolume <= 0) { exitProcess(ResponseCode.BAD_RESOURCE_OR_VALUE.value) }
 
-    if (requestedVolume > resource.value) {
-        println("Ошибка: запрошенный объем ($requestedVolume) превышает доступный (${resource.value})")
-        return false
-    }
+    resource.value -= requestedVolume
 
-    resource.value -= requestedVolume;
-    return true
+    return resource
 }
 
-fun findResource(userResourcePath: String): Resource? {
+fun tryDoAction(resource: Resource, user: User, action: String) {
+    try {
+        val userAccessValue: String? = resource.accessList.find { it.userLogin == user.login }?.access
+        checkAccess(userAccessValue,  Action.valueOf(action.uppercase()).ordinal)
+    } catch (e: Exception) { exitProcess(ResponseCode.BAD_ACTION.value) }
+
+    if (action.lowercase() == Action.READ.value) { exitProcess(ResponseCode.GET_REPORT.value) }
+}
+
+fun getResource(userResourcePath: String): Resource {
     val pathParts = userResourcePath.split(".")
-    if (pathParts.isEmpty()) return null
+    if (pathParts.isEmpty()) exitProcess(ResponseCode.BAD_RESOURCE.value)
 
-    if (pathParts[0] != MainResource.name) return null
+    if (pathParts[0] != MainResource.name) exitProcess(ResponseCode.BAD_RESOURCE.value)
 
     var currentResource: Resource = MainResource
 
     for (i in 1 until pathParts.size) {
         val part = pathParts[i]
-        currentResource = currentResource.resources?.find { it.name == part } ?: return null
+        currentResource = currentResource.resources?.find { it.name == part } ?: exitProcess(ResponseCode.BAD_RESOURCE.value)
     }
 
     return currentResource
 }
 
-fun checkAcces(userAcces: String, needAcces: Int): Boolean {
-   return userAcces[needAcces] == '7'
+fun checkAccess(userAccess: String?, needAccess: Int): Boolean {
+
+    if (userAccess == null || userAccess[needAccess] != '7') {
+        exitProcess(ResponseCode.NOT_ACCESS.value)
+    }
+    else {
+        return true
+    }
 }
 
 enum class Action(val value: String) {
@@ -55,7 +71,7 @@ enum class Action(val value: String) {
 }
 
 enum class ResponseCode(val value: Int) {
-    SUCCES(0),
+    SUCCESS(0),
     GET_REPORT(1),
     INCORRECT_PASSWORD(2),
     INCORRECT_LOGIN(3),
