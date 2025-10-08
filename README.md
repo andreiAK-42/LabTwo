@@ -5,6 +5,9 @@
 * Корбань Андрей
 * Воронков Алексей
 
+# Файл рефакторинга
+[Ссылка на рефактор файл](https://github.com/andreiAK-42/LabTwo/blob/9a48cdffe02b387d4de609e0579c58dcb9de2d52/refactorPlan.md)
+
 # Инструкция по запуску
 
 Перейти в https://github.com/andreiAK-42/LabTwo/releases и выбрать последний релиз. Для запуска обычного файла использовать LabTwo.jar с примерными аргументами:
