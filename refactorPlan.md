@@ -1,7 +1,7 @@
 # Анализ проекта и план рефакторинга
 
 ## Нарушения SOLID принципов
-### Single Responsibility Principle (SRP)
+### Принцип Единственной Ответственности (Single Responsibility Principle, SRP)
 1. Файл `GlobalVariables.kt` отвечает за хранение константы (соль), структуры данных и тестовых данных одновременно. 
 Следует вынести константы в отдельный файл `AppConfig.kt` и тестовые данные в файл `TestData.kt` (лист пользователей, создание ресурсов)
 
@@ -11,18 +11,10 @@
 - `UserAuthenticator` - аутентификация пользователей
 - `ResourceManager` - управление ресурсами
 - `AcessControlService` - контроль доступа
-
-### Open Closed Principle (OCP)
-  (я не уверен на счет этого)
-  1. Функция `tryDoAction()` содержит захардкоженные проверки действий. При добавлении нового действия потребуется менять существующий код.
-     Следует переделать это под паттерн Strategy
-
-### Liskov Substitution Principle (LSP)
-
-### Interface Segregation Principle (ISP)
-  1. В коде Отсутствуют интерфейсы. Из за этого код сильно связан, из за этого его будет трудно тестировать и модифицировать
+ 
+### Принцип разделения интерфейса (Interface Segregation Principle, ISP)
+  1. В коде Отсутствуют интерфейсы. Из за этого код сильно связан, что затрудняет его тестирование и дальнейшие модификации
      Следует ввести интерфейсы для ключевых компонентов
-     
 ```
     interface UserRepository {
     fun findByLogin(login: String): User?
@@ -38,7 +30,7 @@
     }
  ```
 
-  ### Dependency Inversion Principle (DIP)
+  ### Принцип инверсии зависимостей (Dependency Inversion Principle, DIP)
   Функции `tryGetUser()` и `tryGetResource()` напрямую зависят от глобальных переменных `UserStorage`, `MainResource`.
   Следует внедрить зависимости через конструкторы
 ```
