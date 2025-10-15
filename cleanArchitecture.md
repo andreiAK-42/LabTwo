@@ -26,4 +26,4 @@
 - `UserAuthenticator` - аутентификация пользователей
 - `ResourceManager` - управление ресурсами
 - `AcessControlService` - контроль доступа
-3. Ввести интерфейсы для ключевых элементов
+3. Ввести интерфейсы для [ключевых компонентов](https://github.com/andreiAK-42/LabTwo/blob/9a48cdffe02b387d4de609e0579c58dcb9de2d52/refactorPlan.md), а именно: User, Storage, Access
