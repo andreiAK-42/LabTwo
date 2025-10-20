@@ -1,19 +1,13 @@
-import java.security.MessageDigest
 import kotlin.system.exitProcess
 
-fun hashPassword(password: String): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    val encodedHash = digest.digest((Salt + password + Salt).toByteArray())
-
-    return encodedHash.fold("") { str, byte -> str + "%02x".format(byte) }
-}
+val passwordHasher = PasswordHasher()
+val accessControlService = AccessControlService()
 
 fun tryGetUser(login: String, password: String): User {
     val findUser: User? = UserStorage.find { user -> user.login == login }
 
     if (findUser == null) { exitProcess(ResponseCode.INCORRECT_LOGIN.value) }
-
-    if (findUser.password != hashPassword(password)) { exitProcess(ResponseCode.INCORRECT_PASSWORD.value) }
+    if (findUser.password != passwordHasher.hashPassword(password)) { exitProcess(ResponseCode.INCORRECT_PASSWORD.value) }
 
     return findUser
 }
@@ -32,7 +26,7 @@ fun tryGetResource(resourcePath: String, requestedVolume: Int): Resource {
 fun tryDoAction(resource: Resource, user: User, action: String) {
     try {
         val userAccessValue: String? = resource.accessList.find { it.userLogin == user.login }?.access
-        checkAccess(userAccessValue,  Action.valueOf(action.uppercase()).ordinal)
+        accessControlService.checkAccess(userAccessValue,  Action.valueOf(action.uppercase()).ordinal)
     } catch (e: Exception) { exitProcess(ResponseCode.BAD_ACTION.value) }
 
     if (action.lowercase() == Action.READ.value) { exitProcess(ResponseCode.GET_REPORT.value) }
@@ -52,16 +46,6 @@ fun getResource(userResourcePath: String): Resource {
     }
 
     return currentResource
-}
-
-fun checkAccess(userAccess: String?, needAccess: Int): Boolean {
-
-    if (userAccess == null || userAccess[needAccess] != '7') {
-        exitProcess(ResponseCode.NOT_ACCESS.value)
-    }
-    else {
-        return true
-    }
 }
 
 enum class Action(val value: String) {
