@@ -1,3 +1,6 @@
+package services
+
+import Salt
 import java.security.MessageDigest
 
 class PasswordHasher {

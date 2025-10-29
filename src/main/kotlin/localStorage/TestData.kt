@@ -1,3 +1,9 @@
+package localStorage
+
+import models.Resource
+import models.ResourceAccess
+import models.User
+
 val MainResource: Resource = Resource(
     "A", arrayOf(ResourceAccess("alice", "700"), ResourceAccess("root", "777")),
     value = 250,
@@ -15,9 +21,11 @@ val MainResource: Resource = Resource(
                             value = 3,
                             resources = null
                         )
-                    ))
+                    )
+                )
             )
-        ))
+        )
+    )
 )
 
 val UserStorage: List<User> = listOf(

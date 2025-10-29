@@ -1,4 +1,11 @@
-import kotlin.collections.minusAssign
+package repository
+
+import localStorage.MainResource
+import models.Action
+import models.Resource
+import models.ResponseCode
+import models.User
+import services.AccessControlService
 import kotlin.system.exitProcess
 
 class ResourceManager {
@@ -7,8 +14,12 @@ class ResourceManager {
     fun tryGetResource(resourcePath: String, requestedVolume: Int): Resource {
         val resource = getResource(resourcePath)
 
-        if (requestedVolume > resource.value) { exitProcess(ResponseCode.BIG_VALUE.value) }
-        if (requestedVolume <= 0) { exitProcess(ResponseCode.BAD_RESOURCE_OR_VALUE.value) }
+        if (requestedVolume > resource.value) {
+            exitProcess(ResponseCode.BIG_VALUE.value)
+        }
+        if (requestedVolume <= 0) {
+            exitProcess(ResponseCode.BAD_RESOURCE_OR_VALUE.value)
+        }
 
         resource.value -= requestedVolume
 
@@ -35,8 +46,12 @@ class ResourceManager {
         try {
             val userAccessValue: String? = resource.accessList.find { it.userLogin == user.login }?.access
             accessControlService.checkAccess(userAccessValue,  Action.valueOf(action.uppercase()).ordinal)
-        } catch (e: Exception) { exitProcess(ResponseCode.BAD_ACTION.value) }
+        } catch (e: Exception) {
+            exitProcess(ResponseCode.BAD_ACTION.value)
+        }
 
-        if (action.lowercase() == Action.READ.value) { exitProcess(ResponseCode.GET_REPORT.value) }
+        if (action.lowercase() == Action.READ.value) {
+            exitProcess(ResponseCode.GET_REPORT.value)
+        }
     }
 }

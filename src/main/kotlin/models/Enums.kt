@@ -1,3 +1,5 @@
+package models
+
 enum class Action(val value: String) {
     READ("read"),
     WRITE("write"),
