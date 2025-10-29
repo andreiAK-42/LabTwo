@@ -4,12 +4,14 @@ import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.required
 
+private const val loginDescription = "Логин пользователя"
+
 fun parseArguments(args: Array<String>): Arguments {
     val parser = ArgParser("LabTwo")
 
     val login by parser.option(
         ArgType.String,
-        description = "Логин пользователя",
+        description = loginDescription,
         fullName = "login"
     ).required()
 
@@ -30,13 +32,13 @@ fun parseArguments(args: Array<String>): Arguments {
 
     val resource by parser.option(
         ArgType.String,
-        description = "Логин пользователя",
+        description = loginDescription,
         fullName = "resource"
     ).required()
 
     val volume by parser.option(
         ArgType.String,
-        description = "Логин пользователя",
+        description = loginDescription,
         fullName = "volume"
     ).required()
 
