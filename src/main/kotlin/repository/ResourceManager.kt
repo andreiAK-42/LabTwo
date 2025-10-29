@@ -11,19 +11,20 @@ import kotlin.system.exitProcess
 class ResourceManager {
     val accessControlService = AccessControlService()
 
-    fun tryGetResource(resourcePath: String, requestedVolume: Int): Resource {
+    fun tryGetResource(resourcePath: String, requestedVolume: Int): Pair<Resource?, ResponseCode> {
         val resource = getResource(resourcePath)
 
         if (requestedVolume > resource.value) {
-            exitProcess(ResponseCode.BIG_VALUE.value)
+            return Pair(resource, ResponseCode.BIG_VALUE)
         }
+
         if (requestedVolume <= 0) {
-            exitProcess(ResponseCode.BAD_RESOURCE_OR_VALUE.value)
+            return Pair(resource, ResponseCode.BAD_RESOURCE_OR_VALUE)
         }
 
         resource.value -= requestedVolume
 
-        return resource
+        return Pair(resource, ResponseCode.SUCCESS)
     }
 
     private fun getResource(userResourcePath: String): Resource {
@@ -42,16 +43,24 @@ class ResourceManager {
         return currentResource
     }
 
-    fun tryDoAction(resource: Resource, user: User, action: String) {
+    fun tryDoAction(resource: Resource, user: User, action: String): ResponseCode {
         try {
             val userAccessValue: String? = resource.accessList.find { it.userLogin == user.login }?.access
-            accessControlService.checkAccess(userAccessValue,  Action.valueOf(action.uppercase()).ordinal)
-        } catch (e: Exception) {
-            exitProcess(ResponseCode.BAD_ACTION.value)
-        }
 
-        if (action.lowercase() == Action.READ.value) {
-            exitProcess(ResponseCode.GET_REPORT.value)
+            if (accessControlService.checkAccess(userAccessValue, Action.valueOf(action.uppercase()).ordinal) == ResponseCode.SUCCESS) {
+                if (action.lowercase() == Action.READ.value) {
+                    return ResponseCode.GET_REPORT
+                }
+                else {
+                    return ResponseCode.SUCCESS
+                }
+            }
+            else {
+                return ResponseCode.INCORRECT_PASSWORD
+            }
+
+        } catch (e: Exception) {
+           return ResponseCode.BAD_ACTION
         }
     }
 }

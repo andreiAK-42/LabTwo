@@ -1,23 +1,22 @@
 package services
 
-import services.PasswordHasher
 import localStorage.UserStorage
 import models.ResponseCode
 import models.User
-import kotlin.system.exitProcess
 
 class UserAuthentication {
     val passwordHasher = PasswordHasher()
-    fun tryGetUser(login: String, password: String): User {
+    fun tryGetUser(login: String, password: String): Pair<User?, ResponseCode> {
         val findUser: User? = UserStorage.find { user -> user.login == login }
 
         if (findUser == null) {
-            exitProcess(ResponseCode.INCORRECT_LOGIN.value)
-        }
-        if (findUser.password != passwordHasher.hashPassword(password)) {
-            exitProcess(ResponseCode.INCORRECT_PASSWORD.value)
+            return Pair(findUser, ResponseCode.INCORRECT_LOGIN)
         }
 
-        return findUser
+        if (findUser.password != passwordHasher.hashPassword(password)) {
+            return Pair(findUser,ResponseCode.INCORRECT_PASSWORD)
+        }
+
+        return Pair(findUser,ResponseCode.SUCCESS)
     }
 }
