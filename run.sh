@@ -6,6 +6,7 @@ JAR_VERSION="-1.0"
 JAR_NAME="LabTwo${JAR_VERSION}.jar"
 BUILD_DIR="build/libs"
 
+
 echo "=== Сборка LabTwo ==="
 
 ./gradlew clean

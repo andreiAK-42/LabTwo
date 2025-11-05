@@ -1,4 +1,8 @@
-val Salt: String = "123456гшщдлоrejhrjhr3otyrfhejk2edwwsfgrt5%^&*()!@#"
+package localStorage
+
+import models.Resource
+import models.ResourceAccess
+import models.User
 
 val MainResource: Resource = Resource(
     "A", arrayOf(ResourceAccess("alice", "700"), ResourceAccess("root", "777")),
@@ -13,13 +17,15 @@ val MainResource: Resource = Resource(
                     value = 12,
                     resources = arrayOf(
                         Resource(
-                        "f_d", arrayOf(ResourceAccess("alice", "777"), ResourceAccess("root", "777")),
-                        value = 3,
-                        resources = null
+                            "f_d", arrayOf(ResourceAccess("alice", "777"), ResourceAccess("root", "777")),
+                            value = 3,
+                            resources = null
+                        )
                     )
-                ))
+                )
             )
-    ))
+        )
+    )
 )
 
 val UserStorage: List<User> = listOf(
