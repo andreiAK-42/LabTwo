@@ -1,6 +1,6 @@
 package services
 
-import localStorage.UserStorage
+import repository.sqlite.scipts.UserStorage
 import models.ResponseCode
 import models.User
 
