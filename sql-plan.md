@@ -3,12 +3,12 @@
 		login (string, pk)
 		password (string)
 ## 2. Resource:
+		name (string, pk)
 		id(string):	
-		name (string)
 		value (int)
-		parent_id (string, fk)
+		parent_name (string, fk)
 ## 3. ResourceAccess:
-		id (int)
+		id (int, pk)
 		resource_id (string, fk)
 		user_login (string, fk)
 		access_mode (string)
@@ -28,15 +28,14 @@ erDiagram
     }
 
     RESOURCE {
-        string id PK
-        string name
+        string name PK
         int value
-        string parent_id FK
+        string parent_name FK
     }
 
     RESOURCE_ACCESS {
         int id PK
-        string resource_id FK
+        string resource_name FK
         string user_login FK
         string access_mode
     }
@@ -46,12 +45,21 @@ erDiagram
     RESOURCE }o--|| RESOURCE : "is_child_of"
 ```
 # Техническая часть
-БД: H2.
+СУБД: SQLite
 
-Драйвер: JDBC.
+Драйвер: JDBC
 
-Управление: Ручное управление соединениями.
+Подход: Чистый JDBC без ORM-фреймворков
 
-Инициализация и заполение БД будет выполнятся за счет sql скриптов.
-# Изменения в коде
-WIP
+Файл БД: top-secret.db (создается в рабочей директории)
+
+## Механизм заполнения ДБ
+Инициализация БД выполняется через Kotlin-скрипт:
+
+Создание таблиц - выполняются DDL-запросы для создания таблиц user, resource, resource_access
+
+Заполнение пользователей - данные берутся из UserStorage
+
+Рекурсивное заполнение ресурсов - иерархическая структура из MainResource преобразуется в плоскую реляционную модель
+
+Заполнение прав доступа - для каждого ресурса создаются записи в resource_access на основе accessList
