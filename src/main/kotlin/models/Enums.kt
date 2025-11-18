@@ -15,5 +15,7 @@ enum class ResponseCode(val value: Int) {
     NOT_ACCESS(5),
     BAD_RESOURCE(6),
     BAD_RESOURCE_OR_VALUE(7),
-    BIG_VALUE(8);
+    BIG_VALUE(8),
+    SQL_CONNECTION_ERROR(9),
+    SQL_REQUEST_ERROR(10);
 }

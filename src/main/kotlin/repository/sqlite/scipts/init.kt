@@ -1,7 +1,5 @@
 package repository.sqlite.scipts
 
-import localStorage.MainResource
-import localStorage.UserStorage
 import models.Resource
 import java.sql.Connection
 import java.sql.DriverManager

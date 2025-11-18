@@ -1,12 +1,13 @@
-package repository
+package services
 
-import localStorage.MainResource
 import models.Action
 import models.Resource
 import models.ResponseCode
 import models.User
-import services.AccessControlService
-import kotlin.system.exitProcess
+import repository.sqlite.getResourceByPath
+import repository.sqlite.updateResourceValue
+import repository.sqlite.userExists
+import repository.sqlite.resourceExists as repoResourceExists
 
 class ResourceManager(private val accessControlService: AccessControlService) {
 
@@ -32,25 +33,29 @@ class ResourceManager(private val accessControlService: AccessControlService) {
 
     private fun getResource(userResourcePath: String): Pair<Resource?, ResponseCode> {
         val pathParts = userResourcePath.split(".")
-        if (pathParts.isEmpty() || pathParts[0] != MainResource.name) {
+        if (pathParts.isEmpty()) {
             return Pair(null, ResponseCode.BAD_RESOURCE)
         }
 
-        var currentResource: Resource = MainResource
-
-        for (i in 1 until pathParts.size) {
-            val part = pathParts[i]
-            val foundResource = currentResource.resources?.find { it.name == part }
-            if (foundResource == null) {
-                return Pair(null, ResponseCode.BAD_RESOURCE)
-            }
-            currentResource = foundResource
+        val (exists, existsCode) = repoResourceExists(pathParts[0])
+        if (existsCode != ResponseCode.SUCCESS || !exists) {
+            return Pair(null, ResponseCode.BAD_RESOURCE)
         }
 
-        return Pair(currentResource, ResponseCode.SUCCESS)
+        val (resource, resourceCode) = getResourceByPath(pathParts)
+        if (resourceCode != ResponseCode.SUCCESS || resource == null) {
+            return Pair(null, ResponseCode.BAD_RESOURCE)
+        }
+
+        return Pair(resource, ResponseCode.SUCCESS)
     }
 
     fun tryDoAction(resource: Resource, user: User, action: String, volume: Int): ResponseCode {
+        val (userExists, userExistsCode) = userExists(user.login)
+        if (userExistsCode != ResponseCode.SUCCESS || !userExists) {
+            return ResponseCode.NOT_ACCESS
+        }
+
         val actionEnum = try {
             Action.valueOf(action.uppercase())
         } catch (e: IllegalArgumentException) {
@@ -63,7 +68,14 @@ class ResourceManager(private val accessControlService: AccessControlService) {
             return ResponseCode.NOT_ACCESS
         }
 
-        resource.value -= volume
+        val newValue = resource.value - volume
+        val updateResult = updateResourceValue(resource.name, newValue)
+
+        if (updateResult != ResponseCode.SUCCESS) {
+            return updateResult
+        }
+
+        resource.value = newValue
 
         return if (actionEnum == Action.READ) {
             ResponseCode.GET_REPORT

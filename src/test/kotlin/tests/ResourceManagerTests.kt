@@ -1,13 +1,13 @@
 package tests.kotlin.tests
 
-import localStorage.MainResource
+import repository.sqlite.scipts.MainResource
 import models.ResponseCode
 import models.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import repository.ResourceManager
+import services.ResourceManager
 import services.AccessControlService
 
 

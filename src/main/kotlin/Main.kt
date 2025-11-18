@@ -1,16 +1,13 @@
 import models.ResponseCode
-import repository.ResourceManager
+import services.ResourceManager
 import services.AccessControlService
-import services.PasswordHasher
 import services.UserAuthentication
 import services.parseArguments
 import java.io.PrintStream
 import java.nio.charset.StandardCharsets
-import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     System.setOut(PrintStream(System.out, true, StandardCharsets.UTF_8))
-    repository.sqlite.scipts.init()
     val accessControlService = AccessControlService()
     val userAuthentication = UserAuthentication()
     val resourceManager = ResourceManager(accessControlService)

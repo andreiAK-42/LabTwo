@@ -1,4 +1,4 @@
-package localStorage
+package repository.sqlite.scipts
 
 import models.Resource
 import models.ResourceAccess
