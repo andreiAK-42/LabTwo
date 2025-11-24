@@ -1,5 +1,6 @@
 package tests.kotlin.tests
-
+import java.io.File
+import repository.sqlite.scipts.init
 import repository.sqlite.scipts.MainResource
 import models.ResponseCode
 import models.User
@@ -27,9 +28,16 @@ class ResourceManagerTests {
 
     @BeforeEach
     fun setUp() {
+        val dbFile = java.io.File("top-secret.db")
+        if (dbFile.exists()) {
+            dbFile.delete()
+        }
+        init()
+
         mockAccessControlService = MockAccessControlService()
         resourceManager = ResourceManager(mockAccessControlService)
-        testUser = User("testUser", "testPass")
+
+        testUser = User("alice", "123456")
         MainResource.value = 250
         MainResource.resources?.find { it.name == "A8B" }?.value = 56
     }
