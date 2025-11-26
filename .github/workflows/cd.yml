@@ -1,0 +1,68 @@
+name: CD (Deploy & Release)
+
+on:
+  push:
+    branches: [ "master", "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Prepare Build
+        run: |
+          chmod +x setup-libs.sh scripts/*.sh
+          ./setup-libs.sh
+          ./scripts/build.sh
+
+      # Логин в DockerHub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/lab2:latest, ${{ secrets.DOCKERHUB_USERNAME }}/lab2:${{ github.run_number }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          body: "Auto-release from CI/CD. Docker tag: v${{ github.run_number }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload JAR Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/libs/app.jar
+          asset_name: LabTwo.jar
+          asset_content_type: application/java-archive
+
+      - name: Telegram Deploy Notification
+        if: success() && secrets.TELEGRAM_TOKEN != ''
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: "New Release v${{ github.run_number }} is live on DockerHub"
