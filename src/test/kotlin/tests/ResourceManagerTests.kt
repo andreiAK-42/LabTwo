@@ -28,7 +28,7 @@ class ResourceManagerTests {
 
     @BeforeEach
     fun setUp() {
-        val dbFile = java.io.File("top-secret.db")
+        val dbFile = File("top-secret.db")
         if (dbFile.exists()) {
             dbFile.delete()
         }
