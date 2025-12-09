@@ -4,12 +4,14 @@ import models.Action
 import models.Resource
 import models.ResponseCode
 import models.User
-import repository.sqlite.getResourceByPath
-import repository.sqlite.updateResourceValue
-import repository.sqlite.userExists
-import repository.sqlite.resourceExists as repoResourceExists
+import org.springframework.stereotype.Service
+import repository.sqlite.ResourceRepository
 
-class ResourceManager(private val accessControlService: AccessControlService) {
+@Service
+class ResourceManager(
+    private val accessControlService: AccessControlService,
+    private val resourceRepository: ResourceRepository
+) {
 
     fun tryGetResource(resourcePath: String, requestedVolume: Int): Pair<Resource?, ResponseCode> {
         val (resource, responseCode) = getResource(resourcePath)
@@ -37,12 +39,12 @@ class ResourceManager(private val accessControlService: AccessControlService) {
             return Pair(null, ResponseCode.BAD_RESOURCE)
         }
 
-        val (exists, existsCode) = repoResourceExists(pathParts[0])
+        val (exists, existsCode) = resourceRepository.resourceExists(pathParts[0])
         if (existsCode != ResponseCode.SUCCESS || !exists) {
             return Pair(null, ResponseCode.BAD_RESOURCE)
         }
 
-        val (resource, resourceCode) = getResourceByPath(pathParts)
+        val (resource, resourceCode) = resourceRepository.getResourceByPath(pathParts)
         if (resourceCode != ResponseCode.SUCCESS || resource == null) {
             return Pair(null, ResponseCode.BAD_RESOURCE)
         }
@@ -51,7 +53,7 @@ class ResourceManager(private val accessControlService: AccessControlService) {
     }
 
     fun tryDoAction(resource: Resource, user: User, action: String, volume: Int): ResponseCode {
-        val (userExists, userExistsCode) = userExists(user.login)
+        val (userExists, userExistsCode) = resourceRepository.userExists(user.login)
         if (userExistsCode != ResponseCode.SUCCESS || !userExists) {
             return ResponseCode.NOT_ACCESS
         }
@@ -69,7 +71,7 @@ class ResourceManager(private val accessControlService: AccessControlService) {
         }
 
         val newValue = resource.value - volume
-        val updateResult = updateResourceValue(resource.name, newValue)
+        val updateResult = resourceRepository.updateResourceValue(resource.name, newValue)
 
         if (updateResult != ResponseCode.SUCCESS) {
             return updateResult

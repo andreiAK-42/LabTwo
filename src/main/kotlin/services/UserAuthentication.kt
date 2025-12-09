@@ -1,11 +1,12 @@
 package services
 
-import repository.sqlite.scipts.UserStorage
 import models.ResponseCode
 import models.User
+import org.springframework.stereotype.Service
+import repository.sqlite.scipts.UserStorage
 
-class UserAuthentication {
-    val passwordHasher = PasswordHasher()
+@Service
+class UserAuthentication(private val passwordHasher: PasswordHasher) {
     fun tryGetUser(login: String, password: String): Pair<User?, ResponseCode> {
         val findUser: User? = UserStorage.find { user -> user.login == login }
 
@@ -14,9 +15,9 @@ class UserAuthentication {
         }
 
         if (findUser.password != passwordHasher.hashPassword(password)) {
-            return Pair(findUser,ResponseCode.INCORRECT_PASSWORD)
+            return Pair(findUser, ResponseCode.INCORRECT_PASSWORD)
         }
 
-        return Pair(findUser,ResponseCode.SUCCESS)
+        return Pair(findUser, ResponseCode.SUCCESS)
     }
 }

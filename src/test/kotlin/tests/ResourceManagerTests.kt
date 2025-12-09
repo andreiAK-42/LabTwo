@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import services.ResourceManager
 import services.AccessControlService
+import services.ResourceManager
+import repository.sqlite.ResourceRepository
 
 
 class MockAccessControlService : AccessControlService() {
@@ -35,7 +36,7 @@ class ResourceManagerTests {
         init()
 
         mockAccessControlService = MockAccessControlService()
-        resourceManager = ResourceManager(mockAccessControlService)
+        resourceManager = ResourceManager(mockAccessControlService, ResourceRepository())
 
         testUser = User("alice", "123456")
         MainResource.value = 250
