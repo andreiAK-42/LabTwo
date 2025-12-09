@@ -2,21 +2,15 @@
 
 set -e
 
-JAR_VERSION="-1.0"
-JAR_NAME="LabTwo${JAR_VERSION}.jar"
-BUILD_DIR="build/libs"
+JAR_NAME="labtwo-1.0.0.jar"
+MVN="./mvnw"
 
-
-echo "=== Сборка LabTwo ==="
-
-./gradlew clean
-if grep -q "shadow" build.gradle.kts; then
-    ./gradlew shadowJar
-    cp $(find "$BUILD_DIR" -name "*-all.jar" | head -1) "$BUILD_DIR/$JAR_NAME"
-else
-    ./gradlew jar
-    cp $(find "$BUILD_DIR" -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -1) "$BUILD_DIR/$JAR_NAME"
+if [ ! -x "$MVN" ]; then
+  MVN="mvn"
 fi
+
+echo "=== Сборка LabTwo (Maven) ==="
+$MVN -q clean package -DskipTests
 
 echo "=== Введите аргументы ==="
 read -p "Логин: " login
@@ -27,4 +21,4 @@ read -p "Путь до ресурса через '.': " resource
 read -p "Объём ресурса: " volume
 
 echo "=== Запуск программы ==="
-java -jar "$BUILD_DIR/$JAR_NAME" --login "$login" --password "$password" --action "$action" --resource "$resource" --volume "$volume"
+java -jar "target/$JAR_NAME" --login "$login" --password "$password" --action "$action" --resource "$resource" --volume "$volume"
